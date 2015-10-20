@@ -1,7 +1,8 @@
 #include "arvore.h"
 
 // Insere um valor na ABB, de modo que continue sendo uma ABB
-void insereABB (arvore *A, int valor);
+// Retorna 1 se inserido com sucesso, 0 se já existia valor
+int insereABB (arvore *A, int valor);
 
 // Remove um valor da ABB, de modo que continue sendo uma ABB
 // Retorna 1 se removeu com sucesso, ou 0 se valor não encontrado

@@ -1,4 +1,4 @@
-objs = main.o arvore.o abb.c
+objs = main.o arvore.o abb.o
 exe = main
 
 CC = gcc

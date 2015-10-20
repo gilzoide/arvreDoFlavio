@@ -7,7 +7,7 @@ void iniciaArvore (arvore *A) {
 
 
 no *novoNo (int valor) {
-	no *novo = malloc (sizeof (no *));
+	no *novo = malloc (sizeof (no));
 	if (novo == NULL) {
 		return NULL;
 	}
@@ -30,8 +30,6 @@ void destroiNo (no *N) {
 		free (N);
 	}
 }
-
-
 void destroiArvore (arvore *A) {
 	destroiNo (A->raiz);
 	// volta A pro estado inicial: não há nós
