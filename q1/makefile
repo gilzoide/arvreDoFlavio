@@ -10,5 +10,10 @@ all : $(objs)
 run :
 	@./$(exe)
 
+
+.PHONY : clean zip
+zip :
+	zip q1 *.c *.h makefile
+
 clean :
 	$(RM) $(objs) *~ $(exe)
