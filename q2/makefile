@@ -1,4 +1,4 @@
-objs = main.o arvore.o
+objs = main.o arvore.o arvoreGenealogica.o
 exe = main
 
 CC = gcc
