@@ -32,8 +32,13 @@ int main () {
 		scanf ("%d", &opcao);
 
 		switch (opcao) {
+			case 1:
+				imprimeMembros (&A, 1 + 2 * n);
+				break;
+
 			case 3:
 				labelledBracketing (&A);
+				break;
 		}
 	} while (opcao != 0);
 
