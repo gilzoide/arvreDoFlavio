@@ -4,6 +4,7 @@
 
 void iniciaArvore (arvore *A) {
 	A->raiz = NULL;
+	A->n = 0;
 }
 
 

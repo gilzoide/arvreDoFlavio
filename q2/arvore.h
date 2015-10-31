@@ -9,9 +9,10 @@ struct no_t {
 };
 typedef struct no_t no;
 
-// A árvore: só precisamos saber do nó raiz
+// A árvore: só precisamos saber do nó raiz, e quantas pessoas tem
 typedef struct {
 	no *raiz;
+	int n;
 } arvore;
 
 

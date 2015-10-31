@@ -33,7 +33,12 @@ int main () {
 
 		switch (opcao) {
 			case 1:
-				imprimeMembros (&A, 1 + 2 * n);
+				imprimeMembros (&A);
+				break;
+
+			case 2:
+				scanf ("%s", filho);
+				imprimeAntepassados (&A, filho);
 				break;
 
 			case 3:

@@ -53,6 +53,7 @@ int adicionaParentesco (arvore *A, char filho[], char pai[], char mae[]) {
 		}
 	}
 
+	A->n = A->n + 1;
 	return 1;
 }
 
@@ -76,13 +77,12 @@ void labelledBracketing (arvore *A) {
 }
 
 
-// Aqui, n é uma dica de quantas pessoas têm na árvore, pra não desperdiçarmos
-// memória
-void imprimeMembros (arvore *A, int n) {
+void imprimeMembros (arvore *A) {
 	// calloc usado pra inicializar posições como NULL, usado como condição
 	// de parada
 	// `n * 2 + 1` é o número de ponteiros necessários (incluindo os NULLs)
-	no **fila = calloc (n * 2 + 1, sizeof (no *));
+	int n = A->n * 2 + 1;
+	no **fila = calloc (n, sizeof (no *));
 	fila[0] = A->raiz;
 
 	// i é o apontador pro no atual sendo visitado
@@ -113,4 +113,43 @@ void imprimeMembros (arvore *A, int n) {
 	}
 
 	free (fila);
+}
+
+
+/*void */
+void imprimeAntepassados (arvore *A, char nome[]) {
+	no *buscado = buscaFilho (A, nome);
+
+	if (buscado != NULL) {
+		int n = A->n * 2 + 1;
+		no **fila = calloc (n, sizeof (no *));
+		fila[0] = buscado;
+
+		// i é o apontador pro no atual sendo visitado
+		int i;
+		// finalDaFila aponta onde está o final da fila, pra podermos adicionar os
+		// filhos esquerdo e direito do nó atual
+		int finalDaFila = 0;
+		for (i = 0; fila[i] != NULL && i < n; i++) {
+			// enfilera filho esquerdo, se existir
+			if (fila[i]->esquerdo != NULL) {
+				finalDaFila++;
+				fila[finalDaFila] = fila[i]->esquerdo;
+			}
+			// enfilera filho direito, se existir
+			if (fila[i]->direito != NULL) {
+				finalDaFila++;
+				fila[finalDaFila] = fila[i]->direito;
+			}
+
+			if (i != 0) {
+				printf ("%s ", fila[i]->valor);
+			}
+		}
+
+		free (fila);
+	}
+	else {
+		puts ("Membro não encontrado");
+	}
 }

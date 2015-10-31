@@ -1,0 +1,7 @@
+4
+filho1 pai1 mae1
+pai1 avo1 avoh1
+mae1 avo2 avoh2
+avo1 biso bisa
+3
+0
