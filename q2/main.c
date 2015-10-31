@@ -44,6 +44,11 @@ int main () {
 			case 3:
 				labelledBracketing (&A);
 				break;
+
+			case 4:
+				scanf ("%s %s", filho, pai);
+				grauParentesco (&A, filho, pai);
+				break;
 		}
 	} while (opcao != 0);
 

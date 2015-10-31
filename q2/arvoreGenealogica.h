@@ -1,6 +1,6 @@
 #include "arvore.h"
 
-// Adiciona um parentesco, sendo pai e mae pais de filho
+// Adiciona um parentesco, sendo 'pai' e 'mae' pais de 'filho'
 int adicionaParentesco (arvore *A, char filho[], char pai[], char mae[]);
 
 // Imprime os membros da árvore genealógica, por geração
@@ -11,3 +11,6 @@ void imprimeAntepassados (arvore *A, char nome[]);
 
 // Imprime a árvore genealógica em "labelled bracketing"
 void labelledBracketing (arvore *A);
+
+// Imprime o grau de parentesco entre 'filho' e 'antepassado'
+void grauParentesco (arvore *A, char filho[], char antepassado[]);

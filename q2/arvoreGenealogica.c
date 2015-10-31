@@ -150,6 +150,49 @@ void imprimeAntepassados (arvore *A, char nome[]) {
 		free (fila);
 	}
 	else {
-		puts ("Membro não encontrado");
+		printf ("\"%s\" não encontrado\n", nome);
+	}
+}
+
+
+int recGrauParentesco (no *filho, no *antepassado) {
+	// não achou!
+	if (filho == NULL) {
+		return -1;
+	}
+	// caso base: mesma pessoa (distância 0)
+	else if (filho == antepassado) {
+		return 0;
+	}
+	else {
+		int ret = recGrauParentesco (filho->esquerdo, antepassado);
+		if (ret >= 0) {
+			return 1 + ret;
+		}
+
+		ret = recGrauParentesco (filho->direito, antepassado);
+		if (ret >= 0) {
+			return 1 + ret;
+		}
+
+		return -1;
+	}
+}
+void grauParentesco (arvore *A, char filho[], char antepassado[]) {
+	no *noFilho = buscaFilho (A, filho);
+	if (noFilho == NULL) {
+		printf ("\"%s\" não encontrado\n", filho);
+	}
+
+	no *noAntepassado = buscaFilho (A, antepassado);
+	if (noAntepassado == NULL) {
+		printf ("\"%s\" não encontrado\n", antepassado);
+	}
+
+	// ambos encontrados na árvore. Calculemos o grau de parentesco
+	if (noFilho != NULL && noAntepassado != NULL) {
+		int ret = recGrauParentesco (noFilho, noAntepassado);
+		printf ("Entre %s e %s grau de parentesco %d\n", filho, antepassado,
+				ret >= 0 ? ret : 0);
 	}
 }
