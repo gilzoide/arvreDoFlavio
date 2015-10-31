@@ -1,5 +1,5 @@
-// Tamanho máximo dos nomes
-#define MAX 100
+// Tamanho máximo dos números
+#define MAX 5
 
 // Nosso nó, com seu valor e nós filhos
 struct no_t {
@@ -9,10 +9,9 @@ struct no_t {
 };
 typedef struct no_t no;
 
-// A árvore: só precisamos saber do nó raiz, e quantas pessoas tem
+// A árvore: só precisamos saber do nó raiz
 typedef struct {
 	no *raiz;
-	int n;
 } arvore;
 
 
