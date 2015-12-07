@@ -25,6 +25,7 @@ int main () {
     matrizEsparsa *mat = criaMatrizEsparsa (numLinhas, numColunas);
 
 	int opcao, y, x, valor, ret;
+	double det;
 	do {
 		menu ();
 		scanf ("%d", &opcao);
@@ -44,7 +45,9 @@ int main () {
 				scanf ("%d", &valor);
 				printf ("Escolha em que posição da matriz o valor será inserido (MxN) > ");
 				scanf ("%d %d", &y, &x);
-				insereValor (mat, y, x, valor);
+				if (insereValor (mat, y, x, valor) != ERRO) {
+					printf ("Valor %d inserido em %dx%d\n", valor, y, x);
+				}
 				break;
 
 			case 3:
@@ -67,6 +70,13 @@ int main () {
 
 			case 5:
 				printMatriz (mat);
+				break;
+
+			case 6:
+				det = determinante (mat);
+				if (det != ERRO) {
+					printf ("Determinante da matriz = %f", det);
+				}
 				break;
 
 		}

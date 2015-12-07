@@ -36,5 +36,8 @@ int consultaValor (matrizEsparsa *mat, int y, int x);
 /// Escreve a matriz na tela
 void printMatriz (matrizEsparsa *mat);
 
+/// Calcula o determinante da matriz
+double determinante (matrizEsparsa *mat);
+
 /// Apaga uma matrizEsparsa, todas suas células e talz
 void apagaMatrizEsparsa (matrizEsparsa *mat);

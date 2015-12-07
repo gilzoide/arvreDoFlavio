@@ -32,12 +32,12 @@ matrizEsparsa *criaMatrizEsparsa (int linhas, int colunas) {
 int insereValor (matrizEsparsa *mat, int y, int x, int valor) {
     if (y < 0 || x < 0 || y >= mat->numLinhas || x >= mat->numColunas) {
         fprintf (stderr, "Erro na inserção: posição inválida\n");
-        return 0;
+        return ERRO;
     }
 
 	// procura a célula na linha, até que não exista, ou até a célula exatamente depois
     celula **aux;
-    for (aux = &mat->linhas[y]; *aux != NULL; *aux = (*aux)->proxLinha) {
+    for (aux = &mat->linhas[y]; *aux != NULL; aux = &(*aux)->proxLinha) {
         if ((*aux)->x == x) {
             (*aux)->valor = valor;
             return 1;
@@ -50,7 +50,7 @@ int insereValor (matrizEsparsa *mat, int y, int x, int valor) {
 	// já cria a célula nova
 	celula *cel = malloc (sizeof (celula));
 	if (cel == NULL) {
-		return 0;
+		return ERRO;
 	}
 
 	cel->y = y;
@@ -63,7 +63,7 @@ int insereValor (matrizEsparsa *mat, int y, int x, int valor) {
 	*aux = cel;
 
 	// procura a célula na coluna, até que não exista, ou até a célula exatamente depois
-	for (aux = &mat->colunas[x]; *aux != NULL; *aux = (*aux)->proxColuna) {
+	for (aux = &mat->colunas[x]; *aux != NULL; aux = &(*aux)->proxColuna) {
 		if ((*aux)->y > y) {
 			break;
 		}
@@ -152,6 +152,78 @@ void printMatriz (matrizEsparsa *mat) {
 
 		// pula linha, e partiu próxima
 		puts ("");
+	}
+}
+
+
+/// Função auxiliar à 'determinante'. Copia uma matriz
+matrizEsparsa *copiaMatriz (matrizEsparsa *mat) {
+	int tam = mat->numLinhas;
+	matrizEsparsa *nova = criaMatrizEsparsa (tam, tam);
+	celula *aux;
+
+	// percorre matriz original, inserindo na nova qualquer valor encontrado
+	int i;
+	for (i = 0; i < tam; i++) {
+		for (aux = mat->linhas[i]; aux != NULL; aux = aux->proxLinha) {
+			insereValor (nova, aux->y, aux->x, aux->valor);
+		}
+	}
+
+	return nova;
+}
+
+
+double determinante (matrizEsparsa *matOriginal) {
+	if (matOriginal->numLinhas != matOriginal->numColunas) {
+		fprintf (stderr, "Matriz não é quadrada. Determinante não existe\n");
+		return ERRO;
+	}
+
+	matrizEsparsa *mat = copiaMatriz (matOriginal);
+
+	int m = mat->numLinhas;
+	int i, j, k, temp, count;
+	double fator;
+	for (i = 0; i < m - 1; i++) {
+		if (consultaValor (mat, i, i) == 0) {
+			for (k = i; k < m; k++) {
+				if (consultaValor (mat, k, i) != 0) {
+					for (j = 0; j < m; j++) {
+						temp = consultaValor (mat, i, j);
+						insereValor (mat, i, j, consultaValor (mat, k, j));
+						insereValor (mat, k, j, temp);
+					}
+					k = m;
+				}
+			}
+			count++;
+		}
+
+		if (consultaValor (mat, i, i) != 0) {
+			for (k = i + 1; k < m; k++) {
+				fator = -1.0 * consultaValor (mat, k, i) / consultaValor (mat, i, i);
+				for (j = i; j < m; j++) {
+					insereValor (mat, k, j, consultaValor (mat, k, j) +
+							fator * consultaValor (mat, i, j));
+				}
+			}
+		}
+	}
+
+	double det = 1;
+	for (i = 0; i < m; i++) {
+		det *= consultaValor (mat, i, i);
+	}
+
+	// libera memória da nossa matriz copiada
+	apagaMatrizEsparsa (mat);
+
+	if (count % 2 == 0 || det == 0) {
+		return det;
+	}
+	else {
+		return -det;
 	}
 }
 
