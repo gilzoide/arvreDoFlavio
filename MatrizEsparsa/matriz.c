@@ -78,8 +78,8 @@ int insereValor (matrizEsparsa *mat, int y, int x, int valor) {
 
 int somaLinha (matrizEsparsa *mat, int linha) {
 	if (linha < 0 || linha >= mat->numLinhas) {
-		fprintf (stderr, "[somaLinha] Linha inválida\n");
-		return 0;
+		fprintf (stderr, "Linha inválida\n");
+		return ERRO;
 	}
 
 	// acumula valores das células na variável 'soma'
@@ -95,8 +95,8 @@ int somaLinha (matrizEsparsa *mat, int linha) {
 
 int somaColuna (matrizEsparsa *mat, int coluna) {
 	if (coluna < 0 || coluna >= mat->numColunas) {
-		fprintf (stderr, "[somaColuna] Coluna inválida\n");
-		return 0;
+		fprintf (stderr, "Coluna inválida\n");
+		return ERRO;
 	}
 
 	// acumula valores das células na variável 'soma'
@@ -107,6 +107,25 @@ int somaColuna (matrizEsparsa *mat, int coluna) {
 	}
 
 	return soma;
+}
+
+
+int consultaValor (matrizEsparsa *mat, int y, int x) {
+	if (y < 0 || x < 0 || y >= mat->numLinhas || x >= mat->numColunas) {
+		fprintf (stderr, "Posição inválida\n");
+		return ERRO;
+	}
+
+	celula *aux;
+	for (aux = mat->linhas[y]; aux != NULL; aux = aux->proxLinha) {
+		// achou o número
+		if (aux->x == x) {
+			return aux->valor;
+		}
+	}
+
+	// se por acaso não achou uma célula, é porque é zero
+	return 0;
 }
 
 

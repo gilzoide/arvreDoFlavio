@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define ERRO -99999999
+
 typedef struct celula_t {
     int y;
     int x;
@@ -19,7 +21,7 @@ typedef struct {
 /// Cria uma matrizEsparsa de tamanho 'linhas x colunas'
 matrizEsparsa *criaMatrizEsparsa (int linhas, int colunas);
 
-/// Insere um valor na matrizEsparsa nas posições 'y x x'
+/// Insere um valor na matrizEsparsa na posição 'y x x'
 /// Retorna 1 se tudo certo, 0 caso contrário
 int insereValor (matrizEsparsa *mat, int y, int x, int valor);
 
@@ -27,6 +29,9 @@ int insereValor (matrizEsparsa *mat, int y, int x, int valor);
 int somaLinha (matrizEsparsa *mat, int linha);
 /// Calcula a soma dos valores da coluna 'coluna'
 int somaColuna (matrizEsparsa *mat, int coluna);
+
+/// Consulta o valor na matriz na posição 'y x x'
+int consultaValor (matrizEsparsa *mat, int y, int x);
 
 /// Escreve a matriz na tela
 void printMatriz (matrizEsparsa *mat);
