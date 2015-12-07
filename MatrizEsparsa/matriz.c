@@ -35,36 +35,118 @@ int insereValor (matrizEsparsa *mat, int y, int x, int valor) {
         return 0;
     }
 
+	// procura a célula na linha, até que não exista, ou até a célula exatamente depois
     celula **aux;
-    for (*aux = mat->linhas[y]; *aux != NULL; *aux = (*aux)->proxLinha) {
+    for (aux = &mat->linhas[y]; *aux != NULL; *aux = (*aux)->proxLinha) {
         if ((*aux)->x == x) {
             (*aux)->valor = valor;
             return 1;
         }
         else if ((*aux)->x > x) {
-            celula *cel = malloc (sizeof (celula));
-            if (cel == NULL) {
-                return 0;
-            }
-
-            cel->y = y;
-            cel->x = x;
-            cel->proxLinha = *aux;
-            *aux = cel;
-
-            for (*aux = mat->colunas[x]; *aux != NULL; *aux = (*aux)->proxColuna) {
-                if ((*aux)->y > y) {
-                    cel->proxColuna = *aux;
-                    *aux = cel;
-                    return 1;
-                }
-            }
+			break;
         }
     }
+
+	// já cria a célula nova
+	celula *cel = malloc (sizeof (celula));
+	if (cel == NULL) {
+		return 0;
+	}
+
+	cel->y = y;
+	cel->x = x;
+	cel->valor = valor;
+
+
+	// atualiza os ponteiros (linha)
+	cel->proxLinha = *aux;
+	*aux = cel;
+
+	// procura a célula na coluna, até que não exista, ou até a célula exatamente depois
+	for (aux = &mat->colunas[x]; *aux != NULL; *aux = (*aux)->proxColuna) {
+		if ((*aux)->y > y) {
+			break;
+		}
+	}
+
+	// atualiza os ponteiros (coluna)
+	cel->proxColuna = *aux;
+	*aux = cel;
+	return 1;
+}
+
+
+int somaLinha (matrizEsparsa *mat, int linha) {
+	if (linha < 0 || linha >= mat->numLinhas) {
+		fprintf (stderr, "[somaLinha] Linha inválida\n");
+		return 0;
+	}
+
+	// acumula valores das células na variável 'soma'
+	int soma = 0;
+	celula *aux;
+	for (aux = mat->linhas[linha]; aux != NULL; aux = aux->proxLinha) {
+		soma += aux->valor;
+	}
+
+	return soma;
+}
+
+
+int somaColuna (matrizEsparsa *mat, int coluna) {
+	if (coluna < 0 || coluna >= mat->numColunas) {
+		fprintf (stderr, "[somaColuna] Coluna inválida\n");
+		return 0;
+	}
+
+	// acumula valores das células na variável 'soma'
+	int soma = 0;
+	celula *aux;
+	for (aux = mat->colunas[coluna]; aux != NULL; aux = aux->proxColuna) {
+		soma += aux->valor;
+	}
+
+	return soma;
+}
+
+
+void printMatriz (matrizEsparsa *mat) {
+	int i, j;
+	for (i = 0; i < mat->numLinhas; i++) {
+		j = 0;
+		celula *aux = mat->linhas[i];
+		// pra cada célula existente, escreve os zeros antes, e seu valor
+		for (aux = mat->linhas[i]; aux != NULL; aux = aux->proxLinha) {
+			// escreve os zeros anteriores ao X atual
+			while (j < aux->x) {
+				printf ("0 ");
+				j++;
+			}
+			printf ("%d ", aux->valor);
+			j++;
+		}
+		// escreve o resto dos zeros
+		while (j < mat->numColunas) {
+			printf ("0 ");
+			j++;
+		}
+
+		// pula linha, e partiu próxima
+		puts ("");
+	}
 }
 
 
 void apagaMatrizEsparsa (matrizEsparsa *mat) {
+	// apaga as células todas
+	int i;
+	for (i = 0; i < mat->numLinhas; i++) {
+		celula *aux, *proximo;
+		for (aux = mat->linhas[i]; aux != NULL; aux = proximo) {
+			proximo = aux->proxLinha;
+			free (aux);
+		}
+	}
     free (mat->linhas);
     free (mat->colunas);
     free (mat);

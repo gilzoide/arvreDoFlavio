@@ -23,5 +23,13 @@ matrizEsparsa *criaMatrizEsparsa (int linhas, int colunas);
 /// Retorna 1 se tudo certo, 0 caso contrário
 int insereValor (matrizEsparsa *mat, int y, int x, int valor);
 
+/// Calcula a soma dos valores da linha 'linha'
+int somaLinha (matrizEsparsa *mat, int linha);
+/// Calcula a soma dos valores da coluna 'coluna'
+int somaColuna (matrizEsparsa *mat, int coluna);
+
+/// Escreve a matriz na tela
+void printMatriz (matrizEsparsa *mat);
+
 /// Apaga uma matrizEsparsa, todas suas células e talz
 void apagaMatrizEsparsa (matrizEsparsa *mat);
