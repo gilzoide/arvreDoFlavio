@@ -1,5 +1,6 @@
 #include "matriz.h"
 
+// menu nosso de cada dia
 void menu () {
 	puts ("1 - Consultar valor");
 	puts ("2 - Inserir valor");
@@ -24,7 +25,8 @@ int main () {
 
     matrizEsparsa *mat = criaMatrizEsparsa (numLinhas, numColunas);
 
-	int opcao, y, x, valor, ret;
+	int opcao, y, x, ret;
+	double valor;
 	double det;
 	do {
 		menu ();
@@ -42,11 +44,11 @@ int main () {
 
 			case 2:
 				printf ("Escolha o valor a ser inserido > ");
-				scanf ("%d", &valor);
+				scanf ("%lf", &valor);
 				printf ("Escolha em que posição da matriz o valor será inserido (MxN) > ");
 				scanf ("%d %d", &y, &x);
 				if (insereValor (mat, y, x, valor) != ERRO) {
-					printf ("Valor %d inserido em %dx%d\n", valor, y, x);
+					printf ("Valor %6.3lf inserido em %dx%d\n", valor, y, x);
 				}
 				break;
 
@@ -77,6 +79,10 @@ int main () {
 				if (det != ERRO) {
 					printf ("Determinante da matriz = %f", det);
 				}
+				break;
+
+			case 7:
+				gaussSeidel (mat);
 				break;
 
 		}

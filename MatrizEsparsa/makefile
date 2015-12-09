@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -lm
 objs = main.o matriz.o
 exe = saida
 

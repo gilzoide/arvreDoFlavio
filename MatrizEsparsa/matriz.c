@@ -1,4 +1,5 @@
 #include "matriz.h"
+#include <math.h>
 
 matrizEsparsa *criaMatrizEsparsa (int linhas, int colunas) {
     if (linhas <= 0 || colunas <= 0) {
@@ -29,7 +30,7 @@ matrizEsparsa *criaMatrizEsparsa (int linhas, int colunas) {
 }
 
 
-int insereValor (matrizEsparsa *mat, int y, int x, int valor) {
+int insereValor (matrizEsparsa *mat, int y, int x, double valor) {
     if (y < 0 || x < 0 || y >= mat->numLinhas || x >= mat->numColunas) {
         fprintf (stderr, "Erro na inserção: posição inválida\n");
         return ERRO;
@@ -138,15 +139,15 @@ void printMatriz (matrizEsparsa *mat) {
 		for (aux = mat->linhas[i]; aux != NULL; aux = aux->proxLinha) {
 			// escreve os zeros anteriores ao X atual
 			while (j < aux->x) {
-				printf ("0 ");
+				printf ("%6.3f ", 0.0);
 				j++;
 			}
-			printf ("%d ", aux->valor);
+			printf ("%6.3f ", aux->valor);
 			j++;
 		}
 		// escreve o resto dos zeros
 		while (j < mat->numColunas) {
-			printf ("0 ");
+			printf ("%6.3f ", 0.0);
 			j++;
 		}
 
@@ -157,20 +158,15 @@ void printMatriz (matrizEsparsa *mat) {
 
 
 /// Função auxiliar à 'determinante'. Copia uma matriz
-matrizEsparsa *copiaMatriz (matrizEsparsa *mat) {
-	int tam = mat->numLinhas;
-	matrizEsparsa *nova = criaMatrizEsparsa (tam, tam);
-	celula *aux;
-
+void copiaMatriz (matrizEsparsa *destino, matrizEsparsa *origem) {
 	// percorre matriz original, inserindo na nova qualquer valor encontrado
 	int i;
-	for (i = 0; i < tam; i++) {
-		for (aux = mat->linhas[i]; aux != NULL; aux = aux->proxLinha) {
-			insereValor (nova, aux->y, aux->x, aux->valor);
+	celula *aux;
+	for (i = 0; i < origem->numLinhas; i++) {
+		for (aux = origem->linhas[i]; aux != NULL; aux = aux->proxLinha) {
+			insereValor (destino, aux->y, aux->x, aux->valor);
 		}
 	}
-
-	return nova;
 }
 
 
@@ -180,7 +176,9 @@ double determinante (matrizEsparsa *matOriginal) {
 		return ERRO;
 	}
 
-	matrizEsparsa *mat = copiaMatriz (matOriginal);
+	int tam = matOriginal->numLinhas;
+	matrizEsparsa *mat = criaMatrizEsparsa (tam, tam);
+	copiaMatriz (mat, matOriginal);
 
 	int m = mat->numLinhas;
 	int i, j, k, temp, count;
@@ -225,6 +223,69 @@ double determinante (matrizEsparsa *matOriginal) {
 	else {
 		return -det;
 	}
+}
+
+// constantes necessárias: Número máximo de iterações, e precisão desejada (erro máximo permitido)
+#define MAX_ITER 20
+#define MAX_ERRO 0.001
+
+int gaussSeidel (matrizEsparsa *matOriginal) {
+	if (matOriginal->numLinhas != matOriginal->numColunas) {
+		fprintf (stderr, "Matriz não é quadrada. Falows\n");
+		return ERRO;
+	}
+
+	// cria nossa matriz auxiliar, com uma coluna a mais (matriz estendida)
+	int tam = matOriginal->numLinhas;
+	matrizEsparsa *mat = criaMatrizEsparsa (tam, tam + 1);
+	copiaMatriz (mat, matOriginal);
+
+	// vetor de entrada/saída, sistema a ser resolvido
+	double vet[tam];
+	int i;
+	// lê os valores de entrada
+	printf ("Digite os %d valores constantes > ", tam);
+	for (i = 0; i < tam; i++) {
+		scanf ("%lf", &vet[i]);
+	}
+	// coloca os valores na coluna extra da matriz
+	for (i = 0; i < tam; i++) {
+		insereValor (mat, i, tam, vet[i]);		
+	}
+
+	int r, j;
+	float max, erro, soma, t;
+	for (r = 1; r <= MAX_ITER; r++) {
+		max = 0;
+		for (i = 0; i < tam; i++) {
+			soma = 0;
+			for (j = 0; j < tam; j++) {
+				if (j != i) {
+					soma += consultaValor (mat, i, j) * vet[j];
+				}
+			}
+			t = (consultaValor (mat, i, tam) - soma) / consultaValor (mat, i, i);
+			erro = fabs (vet[i] - t);
+			if (erro > max) {
+				max = erro;
+			}
+			vet[i] = t;
+		}
+		// para de calcular quando precisão for alcançada
+		if (max < MAX_ERRO) {
+			break;
+		}
+	}
+
+	printf ("Resultado: ");
+	for (i = 0; i < tam; i++) {
+		printf("%6.3lf ", vet[i]);
+	}
+
+	// libera memória da nossa matriz copiada
+	apagaMatrizEsparsa (mat);
+
+	return 0;
 }
 
 

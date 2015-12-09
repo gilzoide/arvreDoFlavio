@@ -6,7 +6,7 @@
 typedef struct celula_t {
     int y;
     int x;
-    int valor;
+    double valor;
     struct celula_t *proxLinha;
     struct celula_t *proxColuna;
 } celula;
@@ -22,8 +22,8 @@ typedef struct {
 matrizEsparsa *criaMatrizEsparsa (int linhas, int colunas);
 
 /// Insere um valor na matrizEsparsa na posição 'y x x'
-/// Retorna 1 se tudo certo, 0 caso contrário
-int insereValor (matrizEsparsa *mat, int y, int x, int valor);
+/// Retorna 0 se tudo certo, ERRO caso contrário
+int insereValor (matrizEsparsa *mat, int y, int x, double valor);
 
 /// Calcula a soma dos valores da linha 'linha'
 int somaLinha (matrizEsparsa *mat, int linha);
@@ -38,6 +38,10 @@ void printMatriz (matrizEsparsa *mat);
 
 /// Calcula o determinante da matriz
 double determinante (matrizEsparsa *mat);
+
+/// Calcula o resultado do sistema linear
+/// Saída é a variável de entrada 'vetor'
+int gaussSeidel (matrizEsparsa *mat);
 
 /// Apaga uma matrizEsparsa, todas suas células e talz
 void apagaMatrizEsparsa (matrizEsparsa *mat);
