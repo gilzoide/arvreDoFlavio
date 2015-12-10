@@ -77,14 +77,14 @@ int insereValor (matrizEsparsa *mat, int y, int x, double valor) {
 }
 
 
-int somaLinha (matrizEsparsa *mat, int linha) {
+double somaLinha (matrizEsparsa *mat, int linha) {
 	if (linha < 0 || linha >= mat->numLinhas) {
 		fprintf (stderr, "Linha inválida\n");
 		return ERRO;
 	}
 
 	// acumula valores das células na variável 'soma'
-	int soma = 0;
+	double soma = 0;
 	celula *aux;
 	for (aux = mat->linhas[linha]; aux != NULL; aux = aux->proxLinha) {
 		soma += aux->valor;
@@ -94,14 +94,14 @@ int somaLinha (matrizEsparsa *mat, int linha) {
 }
 
 
-int somaColuna (matrizEsparsa *mat, int coluna) {
+double somaColuna (matrizEsparsa *mat, int coluna) {
 	if (coluna < 0 || coluna >= mat->numColunas) {
 		fprintf (stderr, "Coluna inválida\n");
 		return ERRO;
 	}
 
 	// acumula valores das células na variável 'soma'
-	int soma = 0;
+	double soma = 0;
 	celula *aux;
 	for (aux = mat->colunas[coluna]; aux != NULL; aux = aux->proxColuna) {
 		soma += aux->valor;
@@ -111,7 +111,7 @@ int somaColuna (matrizEsparsa *mat, int coluna) {
 }
 
 
-int consultaValor (matrizEsparsa *mat, int y, int x) {
+double consultaValor (matrizEsparsa *mat, int y, int x) {
 	if (y < 0 || x < 0 || y >= mat->numLinhas || x >= mat->numColunas) {
 		fprintf (stderr, "Posição inválida\n");
 		return ERRO;
@@ -139,15 +139,15 @@ void printMatriz (matrizEsparsa *mat) {
 		for (aux = mat->linhas[i]; aux != NULL; aux = aux->proxLinha) {
 			// escreve os zeros anteriores ao X atual
 			while (j < aux->x) {
-				printf ("%6.3f ", 0.0);
+				printf ("%6.3lf ", 0.0);
 				j++;
 			}
-			printf ("%6.3f ", aux->valor);
+			printf ("%6.3lf ", aux->valor);
 			j++;
 		}
 		// escreve o resto dos zeros
 		while (j < mat->numColunas) {
-			printf ("%6.3f ", 0.0);
+			printf ("%6.3lf ", 0.0);
 			j++;
 		}
 
@@ -226,8 +226,8 @@ double determinante (matrizEsparsa *matOriginal) {
 }
 
 // constantes necessárias: Número máximo de iterações, e precisão desejada (erro máximo permitido)
-#define MAX_ITER 20
-#define MAX_ERRO 0.001
+#define MAX_ITER 200
+#define MAX_ERRO 0.0000000000001
 
 int gaussSeidel (matrizEsparsa *matOriginal) {
 	if (matOriginal->numLinhas != matOriginal->numColunas) {
@@ -237,50 +237,67 @@ int gaussSeidel (matrizEsparsa *matOriginal) {
 
 	// cria nossa matriz auxiliar, com uma coluna a mais (matriz estendida)
 	int tam = matOriginal->numLinhas;
-	matrizEsparsa *mat = criaMatrizEsparsa (tam, tam + 1);
+	matrizEsparsa *mat = criaMatrizEsparsa (tam, tam);
 	copiaMatriz (mat, matOriginal);
 
 	// vetor de entrada/saída, sistema a ser resolvido
-	double vet[tam];
-	int i;
+	double vetIn[tam], vetOut[tam];
+	int i, j;
 	// lê os valores de entrada
 	printf ("Digite os %d valores constantes > ", tam);
 	for (i = 0; i < tam; i++) {
-		scanf ("%lf", &vet[i]);
-	}
-	// coloca os valores na coluna extra da matriz
-	for (i = 0; i < tam; i++) {
-		insereValor (mat, i, tam, vet[i]);		
+		scanf ("%lf", &vetIn[i]);
 	}
 
-	int r, j;
-	float max, erro, soma, t;
-	for (r = 1; r <= MAX_ITER; r++) {
-		max = 0;
+	double diag, soma;
+	// normaliza matriz
+	for (i = 0; i < tam; i++) {
+		diag = consultaValor (mat, i, i);
+		soma = 0;
+		for (j = 0; j < tam; j++) {
+			if (i != j) {
+				soma += fabs (consultaValor (mat, i, j));
+			}
+		}
+		if (diag < soma) {
+			fprintf (stderr, "Matriz pode não convergir pelo método. Abortando\n");
+			return ERRO;
+		}
+		for (j = 0; j < tam; j++) {
+			insereValor (mat, i, j, consultaValor (mat, i, j) / diag);
+		}
+		vetIn[i] /= diag;
+		vetOut[i] = vetIn[i];
+	}
+	
+	int n;
+	double erro, maxErro, novo;
+	for (n = 0; n < MAX_ITER; n++) {
+		soma = 0;
+		maxErro = 0;
 		for (i = 0; i < tam; i++) {
-			soma = 0;
 			for (j = 0; j < tam; j++) {
-				if (j != i) {
-					soma += consultaValor (mat, i, j) * vet[j];
+				if (i != j) {
+					soma += consultaValor (mat, i, j) * vetOut[j];
 				}
 			}
-			t = (consultaValor (mat, i, tam) - soma) / consultaValor (mat, i, i);
-			erro = fabs (vet[i] - t);
-			if (erro > max) {
-				max = erro;
+			novo = (vetIn[i] - soma) / consultaValor (mat, i, i);
+			erro = fabs (novo - vetOut[i]);
+			if (erro > maxErro) {
+				maxErro = erro;
 			}
-			vet[i] = t;
+			vetOut[i] = novo;
 		}
-		// para de calcular quando precisão for alcançada
-		if (max < MAX_ERRO) {
+		if (maxErro < MAX_ERRO) {
 			break;
 		}
 	}
-
-	printf ("Resultado: ");
+	printf ("Após %d iterações: ", n);
 	for (i = 0; i < tam; i++) {
-		printf("%6.3lf ", vet[i]);
+		printf ("%lf ", vetOut[i]);
 	}
+	puts ("");
+	
 
 	// libera memória da nossa matriz copiada
 	apagaMatrizEsparsa (mat);

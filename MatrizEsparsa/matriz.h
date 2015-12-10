@@ -26,12 +26,12 @@ matrizEsparsa *criaMatrizEsparsa (int linhas, int colunas);
 int insereValor (matrizEsparsa *mat, int y, int x, double valor);
 
 /// Calcula a soma dos valores da linha 'linha'
-int somaLinha (matrizEsparsa *mat, int linha);
+double somaLinha (matrizEsparsa *mat, int linha);
 /// Calcula a soma dos valores da coluna 'coluna'
-int somaColuna (matrizEsparsa *mat, int coluna);
+double somaColuna (matrizEsparsa *mat, int coluna);
 
 /// Consulta o valor na matriz na posição 'y x x'
-int consultaValor (matrizEsparsa *mat, int y, int x);
+double consultaValor (matrizEsparsa *mat, int y, int x);
 
 /// Escreve a matriz na tela
 void printMatriz (matrizEsparsa *mat);
